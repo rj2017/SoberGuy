@@ -65,6 +65,11 @@ final class JourneyCoordinator: Coordinator {
         sheetRoute = nil
     }
 
+    func removePerson(id: UUID) {
+        journey.people.removeAll { $0.id == id }
+        persistenceService.save(journey)
+    }
+
     func finish() {
         journey.isFinished = true
         persistenceService.save(journey)

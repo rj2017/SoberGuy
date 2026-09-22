@@ -22,12 +22,13 @@ App mobile iOS para grupos de pessoas em um bar controlarem, em tempo real, quan
 - Adicionar produtos (nome + valor) que são divididos entre as pessoas ativas naquele momento.
 - Adicionar novas pessoas no meio da jornada (afeta só produtos futuros, não os já lançados).
 - Ver em tempo real quanto cada pessoa já deve.
+- Remover uma pessoa da jornada em andamento (swipe-to-delete), com aviso do valor que ela deve pagar.
 - Finalizar a jornada e ver o resumo final por pessoa.
 - Limpar o cache ao fechar a tela de resumo (botão "X").
 
 **Fora do escopo do MVP** *(confirmado)*:
 - Edição ou exclusão de um produto já lançado.
-- Remoção de uma pessoa já cadastrada.
+- Renomear uma pessoa já cadastrada.
 - Histórico de jornadas anteriores.
 - Múltiplas mesas simultâneas.
 - Divisão não-igualitária (ex: só 2 das 5 pessoas dividem uma bebida específica).
@@ -57,7 +58,15 @@ App mobile iOS para grupos de pessoas em um bar controlarem, em tempo real, quan
 - Pessoa = `id`, `nome/apelido`, `timestamp de entrada na jornada`.
 - **Nome/apelido deve ser único dentro da jornada** — o app não deve aceitar cadastrar uma pessoa com nome já existente na mesa (validação obrigatória no formulário de "Adicionar Pessoa", com mensagem de erro amigável e sem permitir confirmar o cadastro).
 - Pessoas podem ser adicionadas a qualquer momento durante a jornada aberta.
-- **Fora do MVP** (confirmado): não é possível remover ou renomear uma pessoa após cadastro.
+- **Fora do MVP** (confirmado): não é possível renomear uma pessoa após cadastro.
+
+**Remoção de pessoa durante a jornada** *(confirmado)*:
+- Uma pessoa pode ser removida da jornada enquanto ela estiver em andamento (antes de "Finalizar Jornada"), a partir da Tela Principal da Jornada.
+- Interação: **swipe-to-delete** na linha da pessoa (arrastar para a esquerda revela o botão destrutivo "Remover"), seguindo o padrão de remoção de itens de lista do Human Interface Guidelines da Apple.
+- **Não é permitido remover uma pessoa se houver apenas 1 pessoa na jornada** — nesse caso a ação de remover simplesmente não fica disponível na linha.
+- Ao remover: um alerta nativo aparece mostrando o nome da pessoa e o valor que ela deve pagar (calculado no momento da remoção, pela mesma fórmula do §4.4), com **apenas um botão "OK"** para fechar. Ao fechar, a pessoa já foi removida e a jornada continua normalmente.
+- A remoção **não é retroativa**: os produtos já lançados mantêm o snapshot original de participantes (§4.2), então o valor devido pelas pessoas remanescentes **não muda**. A pessoa removida deixa de aparecer na lista e não é considerada em produtos adicionados depois da remoção.
+- Fora do MVP: não é possível desfazer a remoção (a pessoa removida não pode "voltar" com seu histórico; se retornar, deve ser cadastrada como pessoa nova, sem os valores anteriores).
 
 ### 4.2 Produtos
 - Produto = `id`, `nome`, `valor`, `timestamp`, `lista de pessoas presentes no momento do lançamento` (snapshot).
@@ -188,7 +197,7 @@ Todos os pontos em aberto da versão anterior deste documento foram resolvidos:
 2. ✅ Se o app for encerrado com a jornada já finalizada (mas sem o usuário ter clicado no "X"), o cache é limpo automaticamente nesse encerramento.
 3. ✅ Persistência via `UserDefaults`.
 4. ✅ Sem edição/exclusão de produtos no MVP.
-5. ✅ Sem remoção de pessoas no MVP.
+5. ⚠️ **Revisado:** a decisão original ("sem remoção de pessoas no MVP") foi **revertida**. Agora é possível remover uma pessoa durante a jornada em andamento (swipe-to-delete, popup com valor devido, proibido se sobrar só 1 pessoa, sem redistribuição retroativa) — ver detalhes em §4.1. Renomear pessoa continua fora do escopo.
 
 Nenhum ponto em aberto no momento. Caso surjam novas dúvidas durante o desenvolvimento com o Claude Code, adicionar aqui.
 
